@@ -19,7 +19,7 @@ services:
       - openvidu.publicurl=https://pathshala.dizitart.com:4443
 
   full-teaching:
-    image: anidotnet/full-teaching:2.3.0
+    image: anidotnet/full-teaching
     depends_on:
       - full-teaching-mysql
       - full-teaching-openvidu-server-kms
