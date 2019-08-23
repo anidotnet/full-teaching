@@ -1,6 +1,7 @@
 package com.fullteaching.backend.session;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
@@ -48,13 +49,15 @@ public class VideoSessionController {
 	@Value("${openvidu.secret}")
 	private String openviduSecret;
 
+	private Random random = new Random(System.currentTimeMillis());
+
 	private Map<Long, io.openvidu.java.client.Session> lessonIdSession = new ConcurrentHashMap<>();
 	private Map<String, Map<Long, String>> sessionIdUserIdToken = new ConcurrentHashMap<>();
 	private Map<String, Integer> sessionIdindexColor = new ConcurrentHashMap<>();
 
-	private String[] colors = { "#2C3539", "#7D0552", "#2B1B17", "#25383C", "#CD7F32", "#151B54", "#625D5D", "#DAB51B",
-			"#3CB4C7", "#461B7E", "#C12267", "#438D80", "#657383", "#E56717", "#667C26", "#E42217", "#FFA62F",
-			"#254117", "#321640", "#321640", "#173180", "#8C001A", "#4863A0" };
+//	private String[] colors = { "#2C3539", "#7D0552", "#2B1B17", "#25383C", "#CD7F32", "#151B54", "#625D5D", "#DAB51B",
+//			"#3CB4C7", "#461B7E", "#C12267", "#438D80", "#657383", "#E56717", "#667C26", "#E42217", "#FFA62F",
+//			"#254117", "#321640", "#321640", "#173180", "#8C001A", "#4863A0" };
 
 	private OpenVidu openVidu;
 	String SECRET;
@@ -112,10 +115,11 @@ public class VideoSessionController {
 
 						log.info("OpenVidu sessionId '{}' succesfully retrieved from OpenVidu Server", sessionId);
 
+
 						token = s
 								.generateToken(new TokenOptions.Builder()
 										.data("{\"name\": \"" + this.user.getLoggedUser().getNickName()
-												+ "\", \"isTeacher\": true, \"color\": \"" + colors[0] + "\"}")
+												+ "\", \"isTeacher\": true, \"color\": \"" + getColor() + "\"}")
 										.build());
 
 						log.info("OpenVidu token '{}' (for session '{}') succesfully retrieved from OpenVidu Server",
@@ -154,7 +158,7 @@ public class VideoSessionController {
 						token = s.generateToken(new TokenOptions.Builder()
 								.data("{\"name\": \"" + this.user.getLoggedUser().getNickName() + "\", \"isTeacher\": "
 										+ ((teacherAuthorized == null) ? "true" : "false") + ", \"color\": \""
-										+ colors[this.sessionIdindexColor.get(s.getSessionId())] + "\"}")
+										+ getColor() + "\"}")
 								.build());
 						log.info("OpenVidu token '{}' (for session '{}') succesfully retrieved from OpenVidu Server",
 								token, sessionId);
@@ -222,4 +226,9 @@ public class VideoSessionController {
 		}
 	}
 
+	private String getColor() {
+		int nextInt = random.nextInt(0xffffff + 1);
+		String colorCode = String.format("#%06x", nextInt);
+		return colorCode;
+	}
 }
