@@ -9,7 +9,7 @@ ADD wait.sh wait.sh
 RUN chmod +x /wait.sh
 
 RUN apt-get update
-RUN apt-get install netcat-openbsd
+RUN apt-get install -y netcat-openbsd
 
 ADD full-teaching-1.0.0.war app.jar
 RUN bash -c 'touch /app.jar'

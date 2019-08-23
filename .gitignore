@@ -7,3 +7,17 @@
 .settings
 .project
 .classpath
+
+
+/src/main/resources/static/inline.bundle.js
+/src/main/resources/static/inline.bundle.js.map
+/src/main/resources/static/main.bundle.js
+/src/main/resources/static/main.bundle.js.map
+/src/main/resources/static/scripts.bundle.js
+/src/main/resources/static/scripts.bundle.js.map
+/src/main/resources/static/styles.bundle.js
+/src/main/resources/static/styles.bundle.js.map
+/src/main/resources/static/vendor.bundle.js
+/src/main/resources/static/vendor.bundle.js.map
+/src/main/resources/static/index.html
+/src/main/resources/static/assets/
