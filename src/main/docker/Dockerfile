@@ -1,4 +1,4 @@
-FROM java:8
+FROM adoptopenjdk/openjdk8-openj9:latest
 
 ## Add the init script to the image
 ADD init.sh init.sh

@@ -16,13 +16,13 @@ for i in $(seq 1 13); do
 	cd ../../../
 	mvn -DskipTests=true clean package docker:build
 	echo "new tag 'bug$i' and push to DockerHub"
-	docker tag codeurjc/full-teaching codeurjc/full-teaching:bug$i
+	docker tag anidotnet/full-teaching anidotnet/full-teaching:bug$i
 
 done
 
 for i in $(seq 1 13); do
 
-	docker push codeurjc/full-teaching:bug$i
+	docker push anidotnet/full-teaching:bug$i
 
 done
 
