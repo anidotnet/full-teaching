@@ -186,44 +186,48 @@ public class VideoSessionController {
 
 	@RequestMapping(value = "/remove-user", method = RequestMethod.POST)
 	public ResponseEntity<Object> removeUser(@RequestBody String sessionName) throws Exception {
+		if (user != null && user.getLoggedUser() != null) {
+			log.info("Removing user '{}' from videosession '{}'", this.user.getLoggedUser().getNickName(), sessionName);
 
-		log.info("Removing user '{}' from videosession '{}'", this.user.getLoggedUser().getNickName(), sessionName);
+			ResponseEntity<Object> authorized = authorizationService.checkBackendLogged();
+			if (authorized != null) {
+				return authorized;
+			}
 
-		ResponseEntity<Object> authorized = authorizationService.checkBackendLogged();
-		if (authorized != null) {
-			return authorized;
-		}
+			JSONObject sessionNameTokenJSON = (JSONObject) new JSONParser().parse(sessionName);
+			Long lessonId = (Long) sessionNameTokenJSON.get("lessonId");
 
-		JSONObject sessionNameTokenJSON = (JSONObject) new JSONParser().parse(sessionName);
-		Long lessonId = (Long) sessionNameTokenJSON.get("lessonId");
+			if (this.lessonIdSession.get(lessonId) != null) {
+				String sessionId = this.lessonIdSession.get(lessonId).getSessionId();
 
-		if (this.lessonIdSession.get(lessonId) != null) {
-			String sessionId = this.lessonIdSession.get(lessonId).getSessionId();
-
-			if (this.sessionIdUserIdToken.containsKey(sessionId)) {
-				if (this.sessionIdUserIdToken.get(sessionId).remove(this.user.getLoggedUser().getId()) != null) {
-					// User left the session
-					log.info("User '{}' removed", this.user.getLoggedUser().getNickName());
-					if (this.sessionIdUserIdToken.get(sessionId).isEmpty()) {
-						// Last user left the session
-						log.info("Last user removed from session. Session '{}' empty and removed", sessionName);
-						this.lessonIdSession.remove(lessonId);
-						this.sessionIdindexColor.remove(sessionId);
+				if (this.sessionIdUserIdToken.containsKey(sessionId)) {
+					if (this.sessionIdUserIdToken.get(sessionId).remove(this.user.getLoggedUser().getId()) != null) {
+						// User left the session
+						log.info("User '{}' removed", this.user.getLoggedUser().getNickName());
+						if (this.sessionIdUserIdToken.get(sessionId).isEmpty()) {
+							// Last user left the session
+							log.info("Last user removed from session. Session '{}' empty and removed", sessionName);
+							this.lessonIdSession.remove(lessonId);
+							this.sessionIdindexColor.remove(sessionId);
+						}
+						return new ResponseEntity<>(HttpStatus.OK);
+					} else {
+						log.error("OpenVidu TOKEN asssociated to user '{}' wasn't valid",
+								this.user.getLoggedUser().getNickName());
+						return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 					}
-					return new ResponseEntity<>(HttpStatus.OK);
 				} else {
-					log.error("OpenVidu TOKEN asssociated to user '{}' wasn't valid",
-							this.user.getLoggedUser().getNickName());
+					log.error("There was no OpenVidu SESSIONID associated with lesson '{}'", lessonId);
 					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			} else {
-				log.error("There was no OpenVidu SESSIONID associated with lesson '{}'", lessonId);
+				log.error("There was no OpenVidu session for lesson with id '{}'", lessonId);
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-		} else {
-			log.error("There was no OpenVidu session for lesson with id '{}'", lessonId);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+
+		log.error("There was no user associated with session '{}'", sessionName);
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
 	private String getColor() {

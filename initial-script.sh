@@ -13,9 +13,17 @@ wget -O - http://ubuntu.kurento.org/kurento.gpg.key | sudo apt-key add -
 sudo apt-get update
 sudo apt-get install kurento-media-server-6.0
 
+# Enable Services
+sudo systemctl enable kurento-media-server
+sudo systemctl enable openvidu
+
 # VARIABLES
 INTERNALIP="$(ip route get 8.8.8.8 | awk '{print $NF; exit}')"
 PUBLICIP="$(wget -qO- ipinfo.io/ip)"
+
+# Environment
+sudo cp /etc/environment /etc/environment.original
+sudo echo "PUBLICIP=\"$(wget -qO- ipinfo.io/ip)\"" >> /etc/environment
 
 # TURN SERVER
 sudo apt-get install coturn
