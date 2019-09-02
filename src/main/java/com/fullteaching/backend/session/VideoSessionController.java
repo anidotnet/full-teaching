@@ -224,6 +224,11 @@ public class VideoSessionController {
 				log.error("There was no OpenVidu session for lesson with id '{}'", lessonId);
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			// FIXME: stop gap. Fix it properly why logged user is coming as null
+			lessonIdSession.clear();
+			sessionIdUserIdToken.clear();
+			sessionIdindexColor.clear();
 		}
 
 		log.error("There was no user associated with session '{}'", sessionName);
